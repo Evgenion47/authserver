@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = ""; // <- search errors here
+
+package api;
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+message inputAuth{
+  string apikey = 1;
+}
+
+message outputAuth{
+  string username = 1;
+  string email = 2;
+  string profilePhotoUrl = 3;
+  string role = 4;
+}
+
+service authServer{
+  rpc Authorization(inputAuth) returns (outputAuth) {
+    option (google.api.http) = {
+      post: "/v1/api/authorization"
+      body: "*"
+    };
+  }
+}

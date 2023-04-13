@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "7123"
+    network_mode: "host"
+  goose:
+    build:
+      context: .
+      dockerfile: migration.Dockerfile
+    network_mode: "host"
+    depends_on:
+      - "postgres"
+    command: ["./wait-for-it/wait-for-it.sh", "postgres:5432", "--", "sh",  "/app/goosemigration.sh"]
+    volumes:
+      - .:/app_directory
+  grpc_server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    network_mode: "host"
+    depends_on:
+      - "postgres"
+    command: ["./wait-for-it/wait-for-it.sh", "postgres:5432", "--", "/app/cmd/server/main",""]
+  grpc_client:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    network_mode: "host"
+    depends_on:
+      - "grpc_server"
+    command: ["./wait-for-it/wait-for-it.sh", "grpc_server:8080", "--", "/app/cmd/client/main",""]
