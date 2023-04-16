@@ -1,27 +1,61 @@
 syntax = "proto3";
 
-option go_package = ""; // <- search errors here
+option go_package = "https://github.com/Evgenion47/authserver/api"; // <- search errors here
 
 package api;
 
-import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
-message inputAuth{
-  string apikey = 1;
+
+message RegisterRequest{
+  string email = 1;
+  string password = 2;
 }
 
-message outputAuth{
-  string username = 1;
-  string email = 2;
-  string profilePhotoUrl = 3;
-  string role = 4;
+message RegisterResponse{
+  int64 status = 1;
+  string error = 2;
+}
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse{
+  int64 status = 1;
+  string error = 2;
+  string token = 3;
+}
+
+message ValidateRequest{
+  string token = 1;
+}
+
+message ValidateResponse{
+  int64 status = 1;
+  string error = 2;
+  int64 userId = 3;
 }
 
 service authServer{
-  rpc Authorization(inputAuth) returns (outputAuth) {
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
     option (google.api.http) = {
-      post: "/v1/api/authorization"
+      post: "/v1/api/register"
+      body: "*"
+    };
+  }
+
+  rpc Login(LoginRequest) returns (LoginResponse){
+    option (google.api.http) = {
+      post: "/v1/api/login"
+      body: "*"
+    };
+  }
+
+  rpc Validate(ValidateRequest) returns (ValidateResponse){
+    option (google.api.http) = {
+      post: "/v1/api/validate"
       body: "*"
     };
   }
